@@ -2,11 +2,13 @@ import React from 'react';
 import axios from 'axios';
 import {
     View, Text, SafeAreaView,
-    ScrollView, StyleSheet
+    ScrollView, StyleSheet, Button, Settings
 } from 'react-native';
 import {List, FlatList} from 'native-base';
 import { FontAwesome } from '@expo/vector-icons';
+import ListCurrency from "./components/ListCurrency";
 import TextBlock from "./components/TextBlock";
+import AppSettings from "./components/AppSettings";
 // import config from 'expo-config';
 // const config = require('config');
 
@@ -16,11 +18,43 @@ interface AppState {
   fontLoaded: boolean;
   config: Config;
   currency: any;
-  // currency: Array<any> | undefined;
+  activePage: AppMode;
 }
 
 interface Config {
   apiKey: string
+}
+
+enum AppMode {
+main = 'main',
+settings = 'settings',
+about = 'about',
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1
+    },
+    cmdPanel: {
+        flexDirection: "row",
+        borderColor: '#FFFFFF',
+        marginBottom: 5,
+        marginTop: 1,
+        alignItems: 'stretch',
+    },
+    button: {
+        // flex: 1,
+        // borderStyle: 'solid',
+        // backgroundColor: '#bfa601',
+        // color: '#000000',
+        // fontWeight: 'bold',
+        minWidth: 300,
+        maxHeight: 30
+    }
+})
+
+function AppAbout() {
+    return null;
 }
 
 export default class App extends React.Component<{},AppState> {
@@ -33,65 +67,54 @@ export default class App extends React.Component<{},AppState> {
       currency: undefined,
         config: {
             apiKey: 'c5373e43-fdbc-4360-8015-6724c734ab75',
-        }
+        },
+        activePage: AppMode.main
     }
   }
 
   async componentDidMount() {
     const apiKey = this.state.config?.apiKey;
-    console.log('KEY: ' + apiKey);
-    // await this.setState({config: {apiKey: apiKey}});
-    try {
-      const response = await axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest',
-          {
-            headers: {
-              // 'Access-Control-Allow-Origin':'*',
-              'Content-Type': "application/json; charset=utf-8",
-              'X-CMC_PRO_API_KEY': apiKey,
-            },
-          })
-
-    // const responseJSON = response.json();
-      console.log(response.data);
-      if(response && response.data) {
-        await this.setState({currency: response.data});
-      }
-    } catch(error) {
-          console.error(error);
-          throw new Error('Ошибка запроса  валюты!')
-        }
+    // console.log('KEY: ' + apiKey);
+    await this.updateContent(apiKey);
+      // setTimeout(await this.updateContent(apiKey), 60 * 60 * 1000);
   }
 
-  FlatListItemSeparator = () => {
-    return (
-        <View
-        />
-    );
+  async updateContent(apiKey: string) {
+      try {
+          const response = await axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest',
+              {
+                  headers: {
+                      'Content-Type': "application/json; charset=utf-8",
+                      'X-CMC_PRO_API_KEY': apiKey,
+                  },
+              });
+         // console.log(response.data);
+         if (response && response.data) {
+             await this.setState({currency: response.data})
+         }
+      } catch(error) {
+          console.error(error);
+          throw new Error('Ошибка запроса  валюты!')
+      }
   }
 
   render() {
-    const currency = this.state.currency;
+    const currency = this.state.currency?.data || [];
+    const active = this.state.activePage;
     return (
-        <SafeAreaView>
-          <ScrollView>
-            <View>
-                <Text>ReactNativeExpo</Text>
+        <SafeAreaView style={styles.container}>
+                <Text style={{marginBottom: 10, marginTop: 30, fontSize: 18, textAlign: 'center', textDecorationStyle: 'double'}}>Список курсов криптовалют</Text>
+            <View style={styles.cmdPanel}>
+                <Button color={'orange'} title='Главная' onPress={()=>this.setState({activePage: AppMode.main})} />
+                <Button color={'orange'} title='Установки' onPress={()=>this.setState({activePage: AppMode.settings})} />
+                <Button color={'orange'} title='Описание' onPress={()=>this.setState({activePage: AppMode.about})} />
+            </View>
 
-                {currency && currency.data?.map((item: any) => (
-                    <TextBlock
-                        id={item.id}
-                        name={item.name}
-                        nameShort={item.symbol}
-                        price={item.quote.USD.price}
-                        changedHourPrc={item.quote.USD.percent_change_1h}
-                        changedDayPrc={item.quote.USD.percent_change_24h}
-                    />
-                ))}
-              </View>
+            {active === AppMode.main && <ListCurrency key={'listCurrency'} items={currency} />}
+            {active === AppMode.settings && <AppSettings  key={'appSettings'} listCurrencyName={currency.map((item: any) => item.name)} />}
+            {active === AppMode.about && <AppAbout  key={'appAbout'} />}
 
-          </ScrollView>
         </SafeAreaView>
-
     );
   }
 }

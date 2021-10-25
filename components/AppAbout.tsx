@@ -1,15 +1,9 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import TextBlock from "./TextBlock";
 
 interface Props {
-    id: string;
-    name: string;
-    nameShort: string;
-    price: number;
-    changedHourPrc: number;
-    changedDayPrc: number;
 }
-
 
 const styles = StyleSheet.create({
     block: {
@@ -51,7 +45,7 @@ const styles = StyleSheet.create({
 });
 
 
-export default class TextBlock extends React.Component<Props, {}> {
+export default class AppSettings extends React.Component<Props, {}> {
 
     constructor(props: any) {
         super(props);
@@ -64,24 +58,14 @@ export default class TextBlock extends React.Component<Props, {}> {
 
     render() {
         return (
-           <View collapsable={true} key={this.props.id} style={styles.block} >
-           <Text  style={styles.textMain}>
-           {`${this.props.name}(${this.props.nameShort})`}
-           </Text>
-               <Text>
-                   {`${this.props.price.toFixed(2)} usd`}
-               </Text>
-
-               <View style={styles.textRow}>
-               <Text style={this.props.changedHourPrc > 0 ? styles.textGreen : styles.textRed}>
-                   {`hour: ${this.props.changedHourPrc.toFixed(2)}% `}
-               </Text>
-                   <Text> | </Text>
-               <Text style={this.props.changedDayPrc > 0 ? styles.textGreen : styles.textRed}>
-                   {`day: ${this.props.changedDayPrc.toFixed(2)}%`}
-               </Text>
-               </View>
-           </View>
+            <View>
+                <Text>О программе</Text>
+                <Text>
+                    Отображает:
+                     - текущий курс криптовалют,
+                     - отклонение за час, день.
+                </Text>
+            </View>
         );
     }
 }
