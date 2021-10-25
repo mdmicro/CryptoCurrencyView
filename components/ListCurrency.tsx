@@ -61,7 +61,9 @@ export default class ListCurrency extends React.Component<Props, {}> {
     render() {
         const items = this.props.items || [];
         return (
-            <ScrollView>
+            <View>
+            <Text style={{marginBottom: 5, marginTop: 5, fontSize: 12, textAlign: 'center'}}>обновлено </Text>
+        <ScrollView>
                 {items && items.map((item: any) => (
                     <TextBlock
                         id={item.id}
@@ -73,6 +75,7 @@ export default class ListCurrency extends React.Component<Props, {}> {
                     />
                 ))}
             </ScrollView>
+            </View>
         );
     }
 }

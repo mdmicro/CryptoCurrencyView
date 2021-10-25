@@ -4,13 +4,10 @@ import {
     View, Text, SafeAreaView,
     ScrollView, StyleSheet, Button, Settings
 } from 'react-native';
-import {List, FlatList} from 'native-base';
 import { FontAwesome } from '@expo/vector-icons';
 import ListCurrency from "./components/ListCurrency";
-import TextBlock from "./components/TextBlock";
 import AppSettings from "./components/AppSettings";
-// import config from 'expo-config';
-// const config = require('config');
+import AppAbout from "./components/AppAbout";
 
 
 interface AppState {
@@ -42,20 +39,17 @@ const styles = StyleSheet.create({
         marginTop: 1,
         alignItems: 'stretch',
     },
-    button: {
-        // flex: 1,
+    buttonWrap: {
+        flex: 1,
         // borderStyle: 'solid',
         // backgroundColor: '#bfa601',
         // color: '#000000',
         // fontWeight: 'bold',
-        minWidth: 300,
-        maxHeight: 30
+        // minWidth: 100,
+        // maxHeight: 30,
+        marginHorizontal: 1
     }
 })
-
-function AppAbout() {
-    return null;
-}
 
 export default class App extends React.Component<{},AppState> {
 
@@ -105,9 +99,15 @@ export default class App extends React.Component<{},AppState> {
         <SafeAreaView style={styles.container}>
                 <Text style={{marginBottom: 10, marginTop: 30, fontSize: 18, textAlign: 'center', textDecorationStyle: 'double'}}>Список курсов криптовалют</Text>
             <View style={styles.cmdPanel}>
-                <Button color={'orange'} title='Главная' onPress={()=>this.setState({activePage: AppMode.main})} />
-                <Button color={'orange'} title='Установки' onPress={()=>this.setState({activePage: AppMode.settings})} />
-                <Button color={'orange'} title='Описание' onPress={()=>this.setState({activePage: AppMode.about})} />
+                <View style={styles.buttonWrap}>
+                    <Button color={'orange'} title='Главная' onPress={()=>this.setState({activePage: AppMode.main})} />
+                </View>
+                <View style={styles.buttonWrap}>
+                    <Button color={'orange'} title='Установки' onPress={()=>this.setState({activePage: AppMode.settings})} />
+                </View>
+                <View style={styles.buttonWrap}>
+                        <Button color={'orange'} title='Описание' onPress={()=>this.setState({activePage: AppMode.about})} />
+                    </View>
             </View>
 
             {active === AppMode.main && <ListCurrency key={'listCurrency'} items={currency} />}

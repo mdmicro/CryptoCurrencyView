@@ -20,8 +20,10 @@ const styles = StyleSheet.create({
     },
     textMain: {
         fontSize: 18,
-        color: '#1063b4',
-        fontWeight: 'bold'
+        color: '#040d17',
+        fontWeight: 'bold',
+        marginBottom: 10,
+        marginHorizontal: 20
     },
     textRed: {
         fontSize: 12,
@@ -31,12 +33,14 @@ const styles = StyleSheet.create({
     textGreen: {
         fontSize: 12,
         color: '#5b9554',
-        fontWeight: 'normal'
+        fontWeight: 'normal',
+        marginHorizontal: 20
     },
     textNormal: {
         fontSize: 12,
         color: '#081a1a',
-        fontWeight: 'normal'
+        fontWeight: 'normal',
+        marginHorizontal: 20
     },
     textRow: {
         flexDirection: "row",
@@ -59,11 +63,9 @@ export default class AppSettings extends React.Component<Props, {}> {
     render() {
         return (
             <View>
-                <Text>О программе</Text>
-                <Text>
-                    Отображает:
-                     - текущий курс криптовалют,
-                     - отклонение за час, день.
+                <Text style={styles.textMain}>О программе</Text>
+                <Text style={styles.textNormal}>
+                    Отображает текущий курс криптовалют, отклонение за час, день.
                 </Text>
             </View>
         );
