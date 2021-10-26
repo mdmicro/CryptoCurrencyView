@@ -3,7 +3,7 @@ import {StyleSheet, Text, View, ToastAndroid, Button} from 'react-native';
 import Storage from "./Storage";
 import {
 	Select,
-	NativeBaseProvider,
+	NativeBaseProvider, Input,
 } from "native-base"
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
 
 interface StateSettings {
 	currencySelected: string | undefined;
+	apiKey: string;
 }
 
 const styles = StyleSheet.create({
@@ -43,11 +44,13 @@ export default class AppSettings extends React.Component<Props, StateSettings> {
 	constructor(props: any) {
 		super(props);
 		this.state = {
-			currencySelected: undefined,
+			apiKey: '',
+			currencySelected: undefined
 		}
 	}
 
 	async componentDidMount() {
+		this.setState({apiKey: await Storage.getApiKey()});
 	}
 
 	render() {
@@ -90,6 +93,16 @@ export default class AppSettings extends React.Component<Props, StateSettings> {
 							}
 							}/>
 						</View>
+					</View>
+
+					<View>
+						<Input placeholder={'ключ API https://coinmarketcap.com/'}
+						       onChangeText={val => this.setState({apiKey: val})}
+						>{this.state.apiKey}
+						</Input>
+						<Button title={'Сохранить ключ API'} onPress={async () => {
+							await Storage.saveApiKey(this.state.apiKey);
+						}}/>
 					</View>
 				</View>
 			</NativeBaseProvider>

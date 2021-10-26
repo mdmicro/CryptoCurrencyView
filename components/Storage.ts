@@ -8,7 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // }
 
 enum KeyStorage {
-	listCurrency = 'listCurrency'
+	listCurrency = 'listCurrency',
+	apiKey = 'apiKey'
 }
 
 export default class Storage {
@@ -37,7 +38,7 @@ export default class Storage {
 
 	public static async delItemCurrency(item: string): Promise<boolean> {
 		let items = await this.getListCurrency();
-		
+
 		if (items.indexOf(item) !== -1) {
 			items.splice(items.indexOf(item))
 			await AsyncStorage.setItem(KeyStorage.listCurrency, JSON.stringify(items));
@@ -46,4 +47,17 @@ export default class Storage {
 		return false;
 	}
 
+	public static async saveApiKey(apiKey: string): Promise<boolean> {
+		if (!apiKey) return false;
+		try {
+			await AsyncStorage.setItem(KeyStorage.apiKey, apiKey);
+		} catch (e) {
+			throw new Error(e);
+		}
+		return true;
+	}
+
+	public static async getApiKey(): Promise<string> {
+		return await AsyncStorage.getItem(KeyStorage.apiKey) || '';
+	}
 }

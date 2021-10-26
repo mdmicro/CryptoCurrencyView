@@ -7,6 +7,7 @@ import {
 import ListCurrency from "./components/ListCurrency";
 import AppSettings from "./components/AppSettings";
 import AppAbout from "./components/AppAbout";
+import Storage from "./components/Storage";
 
 interface AppState {
 	isLoading: boolean;
@@ -59,10 +60,8 @@ export default class App extends React.Component<{}, AppState> {
 	}
 
 	async componentDidMount() {
-		const apiKey = this.state.config?.apiKey;
-		// console.log('KEY: ' + apiKey);
+		const apiKey = await Storage.getApiKey();
 		await this.updateContent(apiKey);
-		// setTimeout(await this.updateContent(apiKey), 60 * 60 * 1000);
 	}
 
 	async updateContent(apiKey: string) {
@@ -74,7 +73,6 @@ export default class App extends React.Component<{}, AppState> {
 						'X-CMC_PRO_API_KEY': apiKey,
 					},
 				});
-			// console.log(response.data);
 			if (response && response.data) {
 				await this.setState({currency: response.data})
 			}
