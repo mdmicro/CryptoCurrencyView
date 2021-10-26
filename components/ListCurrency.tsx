@@ -1,7 +1,8 @@
 import React from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Button, ScrollView, StyleSheet, Text, ToastAndroid, View} from 'react-native';
 import TextBlock from "./TextBlock";
 import Storage from "./Storage";
+import ExtService from "./ExtService";
 
 interface Props {
 	items: Array<any>;
@@ -12,7 +13,7 @@ interface State {
 }
 
 const styles = StyleSheet.create({
-	block: {
+	container: {
 		flex: 1,
 		backgroundColor: '#d2c731',
 		alignItems: 'center',
@@ -23,6 +24,9 @@ const styles = StyleSheet.create({
 		borderStyle: 'dotted',
 		borderWidth: 2,
 		borderColor: 'rgba(35,31,10,0.35)'
+	},
+	item: {
+		marginBottom: 20,
 	},
 	textMain: {
 		fontSize: 18,
@@ -48,6 +52,11 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 	},
+	buttonUpdate: {
+		marginHorizontal: 2,
+		marginBottom: 15,
+		marginTop: 5,
+	}
 });
 
 
@@ -71,7 +80,12 @@ export default class ListCurrency extends React.Component<Props, State> {
 
 		return (
 			<View>
-				<Text style={{marginBottom: 5, marginTop: 5, fontSize: 12, textAlign: 'center'}}>обновлено </Text>
+				<View style={styles.buttonUpdate}>
+					<Button color={'orange'} title={'Обновить'} onPress={async () => {
+						await ExtService.updateContent(await Storage.getApiKey());
+						ToastAndroid.show('Обновлено!', ToastAndroid.SHORT);
+					}}></Button>
+				</View>
 				<ScrollView>
 					{
 						items && items
@@ -89,6 +103,7 @@ export default class ListCurrency extends React.Component<Props, State> {
 							))}
 				</ScrollView>
 			</View>
-		);
+		)
+			;
 	}
 }

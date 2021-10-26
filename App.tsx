@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import {
 	View, Text, SafeAreaView,
 	ScrollView, StyleSheet, Button, Settings
@@ -8,6 +7,7 @@ import ListCurrency from "./components/ListCurrency";
 import AppSettings from "./components/AppSettings";
 import AppAbout from "./components/AppAbout";
 import Storage from "./components/Storage";
+import ExtService from "./components/ExtService";
 
 interface AppState {
 	isLoading: boolean;
@@ -61,24 +61,9 @@ export default class App extends React.Component<{}, AppState> {
 
 	async componentDidMount() {
 		const apiKey = await Storage.getApiKey();
-		await this.updateContent(apiKey);
-	}
-
-	async updateContent(apiKey: string) {
-		try {
-			const response = await axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest',
-				{
-					headers: {
-						'Content-Type': "application/json; charset=utf-8",
-						'X-CMC_PRO_API_KEY': apiKey,
-					},
-				});
-			if (response && response.data) {
-				await this.setState({currency: response.data})
-			}
-		} catch (error) {
-			console.error(error);
-			throw new Error('Ошибка запроса  валюты!')
+		const response = await ExtService.updateContent(apiKey);
+		if (response) {
+			await this.setState({currency: response})
 		}
 	}
 
