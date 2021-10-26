@@ -78,6 +78,7 @@ export default class ListCurrency extends React.Component<Props, State> {
 							.filter(item => this.state.storageCurrencyList.includes(item.name))
 							.map((item: any) => (
 								<TextBlock
+									key={item.id}
 									id={item.id}
 									name={item.name}
 									nameShort={item.symbol}

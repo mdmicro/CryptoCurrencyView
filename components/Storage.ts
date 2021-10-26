@@ -21,21 +21,29 @@ export default class Storage {
 		return resItems;
 	}
 
-	public static async addItemCurrency(item: string): Promise<void> {
-		if (!item) return;
+	public static async addItemCurrency(item: string): Promise<boolean> {
+		if (!item) return false;
 
 		let items = await this.getListCurrency();
-		if (items.includes(item)) return;
+		if (items.includes(item)) return false;
 		items.push(item);
-		await AsyncStorage.setItem(KeyStorage.listCurrency, JSON.stringify(items));
+		try {
+			await AsyncStorage.setItem(KeyStorage.listCurrency, JSON.stringify(items));
+		} catch (e) {
+			throw new Error(e);
+		}
+		return true;
 	}
 
-	public static async delItemCurrency(item: string): Promise<void> {
+	public static async delItemCurrency(item: string): Promise<boolean> {
 		let items = await this.getListCurrency();
+		
 		if (items.indexOf(item) !== -1) {
 			items.splice(items.indexOf(item))
+			await AsyncStorage.setItem(KeyStorage.listCurrency, JSON.stringify(items));
+			return true;
 		}
-		await AsyncStorage.setItem(KeyStorage.listCurrency, JSON.stringify(items));
+		return false;
 	}
 
 }

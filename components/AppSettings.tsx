@@ -1,11 +1,8 @@
 import React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, ToastAndroid, Button} from 'react-native';
 import Storage from "./Storage";
 import {
 	Select,
-	VStack,
-	CheckIcon,
-	Center,
 	NativeBaseProvider,
 } from "native-base"
 
@@ -41,7 +38,6 @@ const styles = StyleSheet.create({
 	}
 });
 
-
 export default class AppSettings extends React.Component<Props, StateSettings> {
 
 	constructor(props: any) {
@@ -56,37 +52,12 @@ export default class AppSettings extends React.Component<Props, StateSettings> {
 
 	render() {
 		return (
-			// <NativeBaseProvider>
-			//     <Center flex={1} px="3">
-			//
-			//         <VStack alignItems="center" space={4}>
-			//             <Select
-			//                 selectedValue={''}
-			//                 minWidth="200"
-			//                 accessibilityLabel="Choose Service"
-			//                 placeholder="Choose Service"
-			//                 _selectedItem={{
-			//                     bg: "teal.600",
-			//                     endIcon: <CheckIcon size="5" />,
-			//                 }}
-			//                 mt={1}
-			//                 onValueChange={()=>{}}
-			//             >
-			//                 <Select.Item label="UX Research" value="ux" />
-			//                 <Select.Item label="Web Development" value="web" />
-			//                 <Select.Item label="Cross Platform Development" value="cross" />
-			//                 <Select.Item label="UI Designing" value="ui" />
-			//                 <Select.Item label="Backend Development" value="backend" />
-			//             </Select>
-			//         </VStack>
-			//     </Center>
-			// </NativeBaseProvider>
 			<NativeBaseProvider>
 				<View style={styles.header}>
 					<Text>Установки</Text>
 				</View>
-				<View style={styles.block}>
-					<View style={styles.buttonWrap}>
+				<View>
+					<View>
 						<Select placeholder={'Выбор валюты'}
 						        onValueChange={item => this.setState({currencySelected: item})}
 						>
@@ -95,17 +66,31 @@ export default class AppSettings extends React.Component<Props, StateSettings> {
 							)}
 						</Select>
 					</View>
-					<View style={styles.buttonWrap}>
-						<Button title={'Добавить'} onPress={() => {
-							this.state.currencySelected && Storage.addItemCurrency(this.state.currencySelected);
-						}}></Button>
-					</View>
-					<View style={styles.buttonWrap}>
-						<Button title={'Удалить'} onPress={() => {
-							this.state.currencySelected && Storage.delItemCurrency(this.state.currencySelected);
-						}}></Button>
-					</View>
 
+					<View style={styles.block}>
+						<View style={styles.buttonWrap}>
+							<Button title={'Добавить'} onPress={async () => {
+								if (this.state.currencySelected) {
+									const res = await Storage.addItemCurrency(this.state.currencySelected);
+									res
+										? ToastAndroid.show('Сохранено!', ToastAndroid.SHORT)
+										: ToastAndroid.show('Уже есть в списке или ничего не было выбрано!', ToastAndroid.SHORT);
+								}
+							}
+							}/>
+						</View>
+						<View style={styles.buttonWrap}>
+							<Button title={'Удалить'} onPress={async () => {
+								if (this.state.currencySelected) {
+									const res = await Storage.delItemCurrency(this.state.currencySelected);
+									res
+										? ToastAndroid.show('Удалено!', ToastAndroid.SHORT)
+										: ToastAndroid.show('Отсутствует в списке или ничего не было выбрано!', ToastAndroid.SHORT);
+								}
+							}
+							}/>
+						</View>
+					</View>
 				</View>
 			</NativeBaseProvider>
 		);
