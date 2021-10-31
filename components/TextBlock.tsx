@@ -14,14 +14,15 @@ interface Props {
 const styles = StyleSheet.create({
     block: {
         flex: 1,
-        backgroundColor: '#d2c731',
+        backgroundColor: 'rgba(224,218,209,0.78)',
         alignItems: 'center',
         justifyContent: 'center',
         marginHorizontal: 2,
+        marginBottom: 2,
         paddingHorizontal: 2,
         paddingVertical: 2,
         borderStyle: 'dotted',
-        borderWidth: 2,
+        borderWidth: 0,
         borderColor: 'rgba(35,31,10,0.35)'
     },
     textMain: {
@@ -30,17 +31,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     textRed: {
-        fontSize: 12,
+        fontSize: 14,
         color: '#de889b',
         fontWeight: 'normal'
     },
     textGreen: {
-        fontSize: 12,
+        fontSize: 14,
         color: '#5b9554',
         fontWeight: 'normal'
     },
     textNormal: {
-        fontSize: 12,
+        fontSize: 14,
         color: '#081a1a',
         fontWeight: 'normal'
     },

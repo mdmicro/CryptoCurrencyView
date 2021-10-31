@@ -66,7 +66,7 @@ export default class AppSettings extends React.Component<Props, StateSettings> {
 				        onValueChange={item => this.setState({currencySelected: item})}
 				>
 					{this.props.listCurrencyName && this.props.listCurrencyName.map(item =>
-						<Select.Item label={item} value={item}/>
+						<Select.Item label={item} value={item} key={item}/>
 					)}
 				</Select>
 			</View>

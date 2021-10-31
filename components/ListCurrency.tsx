@@ -15,7 +15,7 @@ interface State {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: '#d2c731',
+		backgroundColor: 'rgba(239,136,17,0.68)',
 		alignItems: 'center',
 		justifyContent: 'center',
 		marginHorizontal: 2,

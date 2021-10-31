@@ -53,14 +53,14 @@ export default class App extends React.Component<{}, AppState> {
 			fontLoaded: false,
 			currency: undefined,
 			config: {
-				apiKey: 'c5373e43-fdbc-4360-8015-6724c734ab75',
+				apiKey: '',
 			},
 			activePage: AppMode.main
 		}
 	}
 
 	async componentDidMount() {
-		const apiKey = await Storage.getApiKey();
+		const apiKey = await Storage.getApiKey() || 'c5373e43-fdbc-4360-8015-6724c734ab75';
 		const response = await ExtService.updateContent(apiKey);
 		if (response) {
 			await this.setState({currency: response})
