@@ -58,6 +58,8 @@ export default class Storage {
 	}
 
 	public static async getApiKey(): Promise<string> {
-		return await AsyncStorage.getItem(KeyStorage.apiKey) || '';
+		const res =  await AsyncStorage.getItem(KeyStorage.apiKey) || 'c5373e43-fdbc-4360-8015-6724c734ab75';
+		// console.log('key: ' + res);
+		return res;
 	}
 }

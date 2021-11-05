@@ -60,8 +60,10 @@ export default class App extends React.Component<{}, AppState> {
 	}
 
 	async componentDidMount() {
-		const apiKey = await Storage.getApiKey() || 'c5373e43-fdbc-4360-8015-6724c734ab75';
+		const apiKey = await Storage.getApiKey();
 		const response = await ExtService.updateContent(apiKey);
+		// console.log('App:Component did mount:currency: ');
+		// console.log(response);
 		if (response) {
 			await this.setState({currency: response})
 		}
@@ -69,6 +71,7 @@ export default class App extends React.Component<{}, AppState> {
 
 	render() {
 		const currency = this.state.currency?.data || [];
+		// const currency = this.state.currency;
 		const active = this.state.activePage;
 		return (
 			<SafeAreaView style={styles.container}>

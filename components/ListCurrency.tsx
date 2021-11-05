@@ -10,6 +10,7 @@ interface Props {
 
 interface State {
 	storageCurrencyList: Array<string>;
+	currency: Array<any>;
 }
 
 const styles = StyleSheet.create({
@@ -66,30 +67,32 @@ export default class ListCurrency extends React.Component<Props, State> {
 		super(props);
 		this.state = {
 			storageCurrencyList: [],
+			currency: [],
 		}
 	}
 
 	async componentDidMount() {
 		const list = await Storage.getListCurrency();
 		this.setState({storageCurrencyList: list})
-		console.log(list);
+		this.setState({currency: this.props.items})
+		// console.log(list);
 	}
 
 	render() {
-		const items = this.props.items || [];
-
 		return (
 			<View>
 				<View style={styles.buttonUpdate}>
 					<Button color={'orange'} title={'Обновить'} onPress={async () => {
-						await ExtService.updateContent(await Storage.getApiKey());
+						const res = await ExtService.updateContent(await Storage.getApiKey());
+						res && await this.setState({currency: res.data});
+						// console.log(res);
 						ToastAndroid.show('Обновлено!', ToastAndroid.SHORT);
 					}}></Button>
 				</View>
 				<ScrollView>
 					{
-						items && items
-							.filter(item => this.state.storageCurrencyList.includes(item.name))
+						this.state.currency && this.state.currency
+							.filter((item: any) => this.state.storageCurrencyList.includes(item.name))
 							.map((item: any) => (
 								<TextBlock
 									key={item.id}
