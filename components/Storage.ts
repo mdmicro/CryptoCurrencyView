@@ -13,12 +13,14 @@ enum KeyStorage {
 }
 
 export default class Storage {
+	public static listCurrency: [];
 	constructor(props: any) {
 	}
 
 	public static async getListCurrency(): Promise<Array<string>> {
 		const items = await AsyncStorage.getItem(KeyStorage.listCurrency);
 		const resItems = items ? JSON.parse(items) : [];
+		this.listCurrency = resItems;
 		return resItems;
 	}
 

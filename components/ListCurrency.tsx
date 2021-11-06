@@ -6,11 +6,12 @@ import ExtService from "./ExtService";
 
 interface Props {
 	items: Array<any>;
+	list: Array<string>;
 }
 
 interface State {
 	storageCurrencyList: Array<string>;
-	currency: Array<any>;
+	currency: Array<any> | undefined;
 }
 
 const styles = StyleSheet.create({
@@ -67,32 +68,33 @@ export default class ListCurrency extends React.Component<Props, State> {
 		super(props);
 		this.state = {
 			storageCurrencyList: [],
-			currency: [],
+			currency: undefined,
 		}
 	}
 
 	async componentDidMount() {
-		const list = await Storage.getListCurrency();
-		this.setState({storageCurrencyList: list})
-		this.setState({currency: this.props.items})
 		// console.log(list);
 	}
 
-	render() {
+	render() { // нельзя делать асинхронным !!! будет валить ошибку рендера и фиг поймешь с чего она взялась!!!
+		const currency = this.state.currency || this.props.items || [];
+		const currencyList = this.props.list || [];
 		return (
 			<View>
 				<View style={styles.buttonUpdate}>
 					<Button color={'orange'} title={'Обновить'} onPress={async () => {
 						const res = await ExtService.updateContent(await Storage.getApiKey());
-						res && await this.setState({currency: res.data});
-						// console.log(res);
-						ToastAndroid.show('Обновлено!', ToastAndroid.SHORT);
+						if (res) {
+							await this.setState({currency: res.data});
+							// console.log(res);
+							ToastAndroid.show('Обновлено!', ToastAndroid.SHORT);
+						}
 					}}></Button>
 				</View>
 				<ScrollView>
 					{
-						this.state.currency && this.state.currency
-							.filter((item: any) => this.state.storageCurrencyList.includes(item.name))
+						currency && currency
+							.filter((item: any) => currencyList.includes(item.name))
 							.map((item: any) => (
 								<TextBlock
 									key={item.id}
@@ -106,7 +108,6 @@ export default class ListCurrency extends React.Component<Props, State> {
 							))}
 				</ScrollView>
 			</View>
-		)
-			;
+		);
 	}
 }

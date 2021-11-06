@@ -11,7 +11,6 @@ export default class ExtService {
 						'X-CMC_PRO_API_KEY': apiKey,
 					},
 				});
-			// response && response.data && console.log(JSON.parse(response.data.toString()));
 			if (response && response.data) {
 				// console.log('ExtService:updateContent:resp.data: ');
 				// console.log(response.data);

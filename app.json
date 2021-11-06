@@ -30,6 +30,20 @@
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "",
+          "color": "#ffffff",
+          "sounds": [
+            "",
+            ""
+          ],
+          "mode": "development"
+        }
+      ]
+    ]
   }
 }
