@@ -24,13 +24,14 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
 	console.log(`Got background fetch call at date: ${new Date(now).toISOString()}`);
 	await ExtService.updateContent(await Storage.getApiKey());
 
-	await Notifications.scheduleNotificationAsync({
-		content: {
-			title: "You've got mail! 📬",
-			body: "Let's hope this doesn't crash!",
-		},
-		trigger: new Date(Date.now() + 5000),
-	});
+	// await Notifications.scheduleNotificationAsync({
+	// 	content: {
+	// 		title: "You've got mail! 📬",
+	// 		body: "Let's hope this doesn't crash!",
+	// 	},
+	// 	trigger: new Date(Date.now() + 5000),
+	// });
+
 	// new App({dataUpdate: true});
 	// App.extUpdate();
 	// Be sure to return the successful result type!

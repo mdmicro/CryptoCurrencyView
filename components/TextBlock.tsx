@@ -1,5 +1,7 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, ToastAndroid, TouchableHighlight, View} from 'react-native';
+import {Button, Checkbox, Input, NativeBaseProvider} from "native-base";
+import Storage from "./Storage";
 
 interface Props {
     id: string;
@@ -10,6 +12,9 @@ interface Props {
     changedDayPrc: number;
 }
 
+interface TextBlockI {
+    settingView: boolean;
+}
 
 const styles = StyleSheet.create({
     block: {
@@ -49,14 +54,37 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
     },
+    settingBlock: {
+        flexDirection: "column",
+        borderColor: '#FFFFFF',
+        marginBottom: 2,
+        marginTop: 1,
+        marginVertical: 2,
+        alignItems: 'stretch',
+        paddingHorizontal: 5,
+        paddingVertical: 2,
+    },
+    settingHorizonBlock: {
+        flexDirection: "row",
+        // borderColor: '#FFFFFF',
+        marginBottom: 2,
+        marginTop: 2,
+        // alignItems: 'stretch',
+        marginHorizontal: 2,
+        paddingHorizontal: 5,
+        paddingVertical: 2,
+        borderStyle: 'dotted',
+        borderWidth: 0,
+    },
 });
 
 
-export default class TextBlock extends React.Component<Props, {}> {
+export default class TextBlock extends React.Component<Props, TextBlockI> {
 
     constructor(props: any) {
         super(props);
         this.state = {
+            settingView: false,
         }
     }
 
@@ -64,11 +92,15 @@ export default class TextBlock extends React.Component<Props, {}> {
     }
 
     render() {
+        const settingView = this.state.settingView;
         return (
-           <View collapsable={true} key={this.props.id} style={styles.block} >
-           <Text  style={styles.textMain}>
-           {`${this.props.name}(${this.props.nameShort})`}
-           </Text>
+            <NativeBaseProvider>
+            <TouchableHighlight onPress={()=>{this.setState({settingView: !this.state.settingView})}}>
+                <View collapsable={true} key={this.props.id} style={styles.block}>
+
+               <Text  style={styles.textMain}>
+                   {`${this.props.name}(${this.props.nameShort})`}
+               </Text>
                <Text>
                    {`${this.props.price.toFixed(2)} usd`}
                </Text>
@@ -82,7 +114,28 @@ export default class TextBlock extends React.Component<Props, {}> {
                    {`day: ${this.props.changedDayPrc.toFixed(2)}%`}
                </Text>
                </View>
-           </View>
-        );
+
+                </View>
+           </TouchableHighlight>
+
+                {settingView &&
+                <View style={styles.settingBlock}>
+                    {/*<View style={styles.settingHorizonBlock}>*/}
+                         <Checkbox value='enabled'>уведомления</Checkbox>
+                    {/*</View>*/}
+                    {/*<View style={styles.settingHorizonBlock}>*/}
+                        <Input style={styles.textNormal} placeholder={'станет выше, USD'}/>
+                        <Input placeholder={'станет ниже, USD'}/>
+                    {/*</View>*/}
+                    <Button onPress={async () => {
+                        // await Storage.saveApiKey(this.state.apiKey);
+                        ToastAndroid.show('Сохранено!', ToastAndroid.SHORT)
+                    }}>сохранить</Button>
+
+                </View>
+                }
+
+            </NativeBaseProvider>
+                );
     }
 }

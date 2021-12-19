@@ -89,7 +89,7 @@ export default class ListCurrency extends React.Component<Props, State> {
 							// console.log(res);
 							ToastAndroid.show('Обновлено!', ToastAndroid.SHORT);
 						}
-					}}></Button>
+					}}/>
 				</View>
 				<ScrollView>
 					{
