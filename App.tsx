@@ -1,7 +1,7 @@
 import React from 'react';
 import {
 	View, Text, SafeAreaView,
-	ScrollView, StyleSheet, Button, Settings
+	ScrollView, StyleSheet, Button, Settings, Alert, Platform
 } from 'react-native';
 import ListCurrency from "./components/ListCurrency";
 import AppSettings from "./components/AppSettings";
@@ -12,6 +12,8 @@ import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import {BackgroundFetchResult} from "expo-background-fetch";
 import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
+import Constants from 'expo-constants';
 
 const BACKGROUND_FETCH_TASK = 'background-fetch';
 
@@ -21,7 +23,16 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
 	const now = Date.now();
 	console.log(`Got background fetch call at date: ${new Date(now).toISOString()}`);
 	await ExtService.updateContent(await Storage.getApiKey());
-	new App({dataUpdate: true});
+
+	await Notifications.scheduleNotificationAsync({
+		content: {
+			title: "You've got mail! 📬",
+			body: "Let's hope this doesn't crash!",
+		},
+		trigger: new Date(Date.now() + 5000),
+	});
+	// new App({dataUpdate: true});
+	// App.extUpdate();
 	// Be sure to return the successful result type!
 	return BackgroundFetchResult.NewData;
 	// return BackgroundFetch.Result?.NewData;
@@ -45,6 +56,8 @@ interface AppState {
 	list: Array<any>;
 	activePage: AppMode;
 	dataUpdate: boolean;
+	expoPushToken: any;
+	notification: any;
 }
 
 interface AppProps {
@@ -64,7 +77,7 @@ enum AppMode {
 Notifications.setNotificationHandler({
 	handleNotification: async () => ({
 		shouldShowAlert: true,
-		shouldPlaySound: false,
+		shouldPlaySound: true,
 		shouldSetBadge: false,
 	}),
 });
@@ -101,21 +114,93 @@ export default class App extends React.Component<AppProps, AppState> {
 				apiKey: '',
 			},
 			activePage: AppMode.main,
-			dataUpdate: props.dataUpdate,
+			// dataUpdate: props.dataUpdate,
+			dataUpdate: false,
+			expoPushToken: '',
+			notification: false,
 		}
+
+		this.registerForPushNotificationsAsync().then((token: any) =>
+			this.setState({expoPushToken: token})
+		);
+		Notifications.addNotificationReceivedListener((notification: any) => {
+			console.log('Notification received at: ' + new Date(Date.now()));
+			this.setState({notification});
+		});
+		Notifications.addNotificationResponseReceivedListener((response) => {
+			console.log('Notification response received at: ' + new Date(Date.now()));
+		});
 	}
 
+	// extUpdate() {
+	// 	this.setState({dataUpdate: true});
+	// }
+
 	async componentDidMount() {
+		this.setState({list: await Storage.getListCurrency()});
 		await ExtService.updateContent(await Storage.getApiKey());
-		const list = await Storage.getListCurrency();
-		this.setState({list});
 		// console.log(list);
 		// console.log('App:Component did mount:currency: ');
 		if (ExtService.updateData) {
 			// console.log(ExtService.updateData.data[0].name);
 			this.setState({currency: ExtService.updateData.data})
 		}
+		// Alert.alert('warning', 'test!');
+		// this.state.dataUpdate && this.setState({dataUpdate: false});
 	}
+
+	// Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/dashboard/notifications
+	async showNotification() {
+		let trigger = new Date(Date.now() + 5000); // notification sheduler after 10 sec
+		console.log('Notification scheduled for: ' + trigger);
+		await Notifications.scheduleNotificationAsync({
+			content: {
+				title: "You've got mail! 📬",
+				body: "Let's hope this doesn't crash!",
+			},
+			trigger: trigger,
+		});
+	}
+
+	async registerForPushNotificationsAsync() {
+		let token;
+		if (Constants.isDevice) {
+			const { status: existingStatus } = await Permissions.getAsync(
+				Permissions.NOTIFICATIONS
+			);
+			let finalStatus = existingStatus;
+			if (existingStatus !== 'granted') {
+				const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+				finalStatus = status;
+			}
+			if (finalStatus !== 'granted') {
+				alert('Failed to get push token for push notification!');
+				return;
+			}
+			token = (
+				await Notifications.getExpoPushTokenAsync({
+					experienceId: '@charliecruzan/myapp',
+				})
+			).data;
+			console.log(token);
+		} else {
+			alert('Must use physical device for Push Notifications');
+		}
+
+		if (Platform.OS === 'android') {
+			let result = await Notifications.setNotificationChannelAsync('default', {
+				name: 'default',
+				importance: Notifications.AndroidImportance.NONE,
+				enableVibrate: false,
+				// shouldPlaySound: false,
+				sound: null,
+				lightColor: '#FF231F7C',
+				vibrationPattern: null,
+			});
+		}
+		return token;
+	}
+
 
 	render() {
 		const currency = this.state.currency || [];
@@ -132,6 +217,12 @@ export default class App extends React.Component<AppProps, AppState> {
 					textAlign: 'center',
 					textDecorationStyle: 'double'
 				}}>Список курсов криптовалют</Text>
+				<Button
+					title="Press here then restart your device"
+					onPress={async () => {
+						await this.showNotification();
+					}}
+				/>
 				<View style={styles.cmdPanel}>
 					<View style={styles.buttonWrap}>
 						<Button color={'orange'} title='Главная'

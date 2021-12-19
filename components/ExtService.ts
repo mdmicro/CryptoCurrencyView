@@ -13,7 +13,7 @@ export default class ExtService {
 				});
 			if (response && response.data) {
 				// console.log('ExtService:updateContent:resp.data: ');
-				// console.log(response.data);
+				// console.log(response.data[0]);
 				this.updateData = response.data;
 				return response.data;
 			}
