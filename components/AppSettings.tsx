@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, View, ToastAndroid, Button} from 'react-native';
-import Storage from "./Storage";
+import Storage, {ItemCurrency, KeyStorage} from "./Storage";
 import {
 	Select,
 	NativeBaseProvider, Input,
@@ -23,6 +23,13 @@ const styles = StyleSheet.create({
 		fontStyle: 'normal',
 		justifyContent: 'center'
 	},
+	textMain: {
+		fontSize: 18,
+		color: '#040d17',
+		fontWeight: 'bold',
+		marginBottom: 10,
+		marginHorizontal: 20
+	},
 	block: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -37,7 +44,8 @@ const styles = StyleSheet.create({
 	},
 	buttonWrap: {
 		flex: 1,
-		marginHorizontal: 1
+		marginHorizontal: 1,
+		marginTop: 1
 	},
 	selectedWrap: {
 		flex: 2,
@@ -94,6 +102,18 @@ export default class AppSettings extends React.Component<Props, StateSettings> {
 					}/>
 				</View>
 			</View>
+			<View style={styles.block}>
+				<View style={styles.buttonWrap}>
+					<Button title={'Очистить список'} onPress={async () => {
+							const res = await Storage.removeObjStorage(KeyStorage.listCurrency);
+							res
+								? ToastAndroid.show('Удалено!', ToastAndroid.SHORT)
+								: ToastAndroid.show('Ошибка удаления!', ToastAndroid.SHORT);
+						}
+					}
+					/>
+				</View>
+			</View>
 		</View>
 	)
 
@@ -114,7 +134,7 @@ export default class AppSettings extends React.Component<Props, StateSettings> {
 		return (
 			<NativeBaseProvider>
 				<View style={styles.header}>
-					<Text>Установки</Text>
+					<Text style={styles.textMain}>Установки</Text>
 				</View>
 				<View>
 					{this.selectItem()}

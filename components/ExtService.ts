@@ -2,6 +2,8 @@ import axios from "axios";
 
 export default class ExtService {
 	public static updateData: any;
+
+	// запрос списка криптовалют с информацией о курсе
 	public static async updateContent(apiKey: string): Promise<any> {
 		try {
 			const response = await axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest',
@@ -12,8 +14,8 @@ export default class ExtService {
 					},
 				});
 			if (response && response.data) {
-				// console.log('ExtService:updateContent:resp.data: ');
-				// console.log(response.data[0]);
+				console.log('ExtService:updateContent:resp.data: ');
+				console.log(response.data);
 				this.updateData = response.data;
 				return response.data;
 			}

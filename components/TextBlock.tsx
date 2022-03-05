@@ -1,19 +1,92 @@
 import React from 'react';
 import {StyleSheet, Text, ToastAndroid, TouchableHighlight, View} from 'react-native';
 import {Button, Checkbox, Input, NativeBaseProvider} from "native-base";
-import Storage from "./Storage";
+import Storage, {ItemCurrency} from "./Storage";
 
-interface Props {
+export interface TextBlockProps extends ItemCurrency {
     id: string;
-    name: string;
-    nameShort: string;
     price: number;
     changedHourPrc: number;
     changedDayPrc: number;
 }
 
-interface TextBlockI {
+interface TextBlockState {
     settingView: boolean;
+
+    enableNotification: boolean;
+    maxLevel: number;
+    minLevel: number;
+}
+
+
+/** Текстовый блок криптовалюты в списке на главной */
+export default class TextBlock extends React.Component<TextBlockProps, TextBlockState> {
+
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            settingView: false,
+
+            enableNotification: false,
+            maxLevel: 0,
+            minLevel: 0,
+        }
+    }
+
+    async componentDidMount() {
+    }
+
+    render() {
+        const settingView = this.state.settingView;
+        const {enableNotification, maxLevel, minLevel} = this.state;
+        return (
+            <NativeBaseProvider>
+            <TouchableHighlight onPress={()=>{this.setState({settingView: !this.state.settingView})}}>
+                <View collapsable={true} key={this.props.id} style={styles.block}>
+
+               <Text style={styles.textMain}>
+                   {`${this.props.name}(${this.props.name})`}
+               </Text>
+               <Text>
+                   {`${this.props.price.toFixed(2)} usd`}
+               </Text>
+
+               <View style={styles.textRow}>
+               <Text style={this.props.changedHourPrc > 0 ? styles.textGreen : styles.textRed}>
+                   {`hour: ${this.props.changedHourPrc.toFixed(2)}% `}
+               </Text>
+                   <Text> | </Text>
+               <Text style={this.props.changedDayPrc > 0 ? styles.textGreen : styles.textRed}>
+                   {`day: ${this.props.changedDayPrc.toFixed(2)}%`}
+               </Text>
+               </View>
+
+                </View>
+           </TouchableHighlight>
+
+                {settingView &&
+                <View style={styles.settingBlock}>
+                    <Checkbox value='' isChecked={enableNotification} onChange={(enableNotification: boolean) => this.setState({enableNotification})}>уведомления</Checkbox>
+                    <Input placeholder={'верхний порог, USD'} value={(maxLevel > 0) ? maxLevel.toString() : ''} onChangeText={(text)=>this.setState({maxLevel: parseInt(text) || 0})}/>
+                    <Input placeholder={'нижний порог, USD'} value={(minLevel > 0) ? minLevel.toString() : ''} onChangeText={(text)=>this.setState({minLevel: parseInt(text) || 0})}/>
+                    <Button onPress={async () => {
+                        const itemCurrency: ItemCurrency = {
+                            name: this.props.name,
+                            notification: {
+                                enable: this.state.enableNotification,
+                                maxLevel: this.state.maxLevel,
+                                minLevel: this.state.minLevel
+                            }
+                        }
+                        await Storage.updateItemCurrency(itemCurrency)
+                            ? (ToastAndroid.show('Сохранено!', ToastAndroid.SHORT))
+                            : (ToastAndroid.show('Ошибка сохранения настроек!', ToastAndroid.SHORT))
+                    }}>сохранить</Button>
+                </View>
+                }
+            </NativeBaseProvider>
+                );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -63,6 +136,9 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         paddingHorizontal: 5,
         paddingVertical: 2,
+        fontSize: 14,
+        color: '#081a1a',
+        fontWeight: 'normal'
     },
     settingHorizonBlock: {
         flexDirection: "row",
@@ -77,65 +153,3 @@ const styles = StyleSheet.create({
         borderWidth: 0,
     },
 });
-
-
-export default class TextBlock extends React.Component<Props, TextBlockI> {
-
-    constructor(props: any) {
-        super(props);
-        this.state = {
-            settingView: false,
-        }
-    }
-
-    async componentDidMount() {
-    }
-
-    render() {
-        const settingView = this.state.settingView;
-        return (
-            <NativeBaseProvider>
-            <TouchableHighlight onPress={()=>{this.setState({settingView: !this.state.settingView})}}>
-                <View collapsable={true} key={this.props.id} style={styles.block}>
-
-               <Text  style={styles.textMain}>
-                   {`${this.props.name}(${this.props.nameShort})`}
-               </Text>
-               <Text>
-                   {`${this.props.price.toFixed(2)} usd`}
-               </Text>
-
-               <View style={styles.textRow}>
-               <Text style={this.props.changedHourPrc > 0 ? styles.textGreen : styles.textRed}>
-                   {`hour: ${this.props.changedHourPrc.toFixed(2)}% `}
-               </Text>
-                   <Text> | </Text>
-               <Text style={this.props.changedDayPrc > 0 ? styles.textGreen : styles.textRed}>
-                   {`day: ${this.props.changedDayPrc.toFixed(2)}%`}
-               </Text>
-               </View>
-
-                </View>
-           </TouchableHighlight>
-
-                {settingView &&
-                <View style={styles.settingBlock}>
-                    {/*<View style={styles.settingHorizonBlock}>*/}
-                         <Checkbox value='enabled'>уведомления</Checkbox>
-                    {/*</View>*/}
-                    {/*<View style={styles.settingHorizonBlock}>*/}
-                        <Input style={styles.textNormal} placeholder={'станет выше, USD'}/>
-                        <Input placeholder={'станет ниже, USD'}/>
-                    {/*</View>*/}
-                    <Button onPress={async () => {
-                        // await Storage.saveApiKey(this.state.apiKey);
-                        ToastAndroid.show('Сохранено!', ToastAndroid.SHORT)
-                    }}>сохранить</Button>
-
-                </View>
-                }
-
-            </NativeBaseProvider>
-                );
-    }
-}

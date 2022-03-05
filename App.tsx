@@ -6,7 +6,7 @@ import {
 import ListCurrency from "./components/ListCurrency";
 import AppSettings from "./components/AppSettings";
 import AppAbout from "./components/AppAbout";
-import Storage from "./components/Storage";
+import Storage, {ItemCurrency} from "./components/Storage";
 import ExtService from "./components/ExtService";
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
@@ -54,7 +54,7 @@ interface AppState {
 	fontLoaded: boolean;
 	config: Config;
 	currency: Array<any>;
-	list: Array<any>;
+	listSelectedCurrency: Array<ItemCurrency>;
 	activePage: AppMode;
 	dataUpdate: boolean;
 	expoPushToken: any;
@@ -110,7 +110,7 @@ export default class App extends React.Component<AppProps, AppState> {
 			isLoading: true,
 			fontLoaded: false,
 			currency: [],
-			list: [],
+			listSelectedCurrency: [],
 			config: {
 				apiKey: '',
 			},
@@ -138,7 +138,7 @@ export default class App extends React.Component<AppProps, AppState> {
 	// }
 
 	async componentDidMount() {
-		this.setState({list: await Storage.getListCurrency()});
+		this.setState({listSelectedCurrency: await Storage.getListCurrency()});
 		await ExtService.updateContent(await Storage.getApiKey());
 		// console.log(list);
 		// console.log('App:Component did mount:currency: ');
@@ -150,9 +150,13 @@ export default class App extends React.Component<AppProps, AppState> {
 		// this.state.dataUpdate && this.setState({dataUpdate: false});
 	}
 
+	async componentDidUpdate() {
+		this.setState({listSelectedCurrency: await Storage.getListCurrency()});
+	}
+
 	// Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/dashboard/notifications
 	async showNotification() {
-		let trigger = new Date(Date.now() + 5000); // notification sheduler after 10 sec
+		let trigger = new Date(Date.now() + 5000); // notification scheduler after 10 sec
 		console.log('Notification scheduled for: ' + trigger);
 		await Notifications.scheduleNotificationAsync({
 			content: {
@@ -205,8 +209,9 @@ export default class App extends React.Component<AppProps, AppState> {
 
 	render() {
 		const currency = this.state.currency || [];
-		const list = this.state.list || [];
-		// console.log(list);
+		// const listSelectedCurrency = Storage.getListCurrency() || [];
+		const listSelectedCurrency = this.state.listSelectedCurrency || [];
+		// console.log(listSelectedCurrency);
 		// console.log(currency);
 		const active = this.state.activePage;
 		return (
@@ -218,12 +223,12 @@ export default class App extends React.Component<AppProps, AppState> {
 					textAlign: 'center',
 					textDecorationStyle: 'double'
 				}}>Список курсов криптовалют</Text>
-				<Button
-					title="Press here then restart your device"
-					onPress={async () => {
-						await this.showNotification();
-					}}
-				/>
+				{/*<Button*/}
+				{/*	title="Press here then restart your device"*/}
+				{/*	onPress={async () => {*/}
+				{/*		await this.showNotification();*/}
+				{/*	}}*/}
+				{/*/>*/}
 				<View style={styles.cmdPanel}>
 					<View style={styles.buttonWrap}>
 						<Button color={'orange'} title='Главная'
@@ -239,7 +244,7 @@ export default class App extends React.Component<AppProps, AppState> {
 					</View>
 				</View>
 
-				{active === AppMode.main && <ListCurrency key={'listCurrency'} items={currency} list={list} />}
+				{active === AppMode.main && <ListCurrency key={'listCurrency'} items={currency} storageCurrencyList={listSelectedCurrency} />}
 				{active === AppMode.settings &&
 				<AppSettings key={'appSettings'} listCurrencyName={currency.map((item: any) => item.name)}/>}
 				{active === AppMode.about && <AppAbout key={'appAbout'}/>}

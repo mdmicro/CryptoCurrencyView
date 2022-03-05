@@ -7,29 +7,47 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // 	listCurrency: Array<string>;
 // }
 
-enum KeyStorage {
+export enum KeyStorage {
 	listCurrency = 'listCurrency',
 	apiKey = 'apiKey'
 }
 
+export interface ItemCurrency {
+	name: string;
+	notification?: {
+		enable?: boolean;
+		maxLevel?: number;
+		minLevel?: number;
+	}
+}
+
 export default class Storage {
-	public static listCurrency: [];
+	public static listCurrency: ItemCurrency[];
 	constructor(props: any) {
 	}
 
-	public static async getListCurrency(): Promise<Array<string>> {
+	public static async getListCurrency(): Promise<ItemCurrency[]> {
 		const items = await AsyncStorage.getItem(KeyStorage.listCurrency);
 		const resItems = items ? JSON.parse(items) : [];
 		this.listCurrency = resItems;
 		return resItems;
 	}
 
-	public static async addItemCurrency(item: string): Promise<boolean> {
-		if (!item) return false;
-
+	public static async addItemCurrency(itemName: string): Promise<boolean> {
+		if (!itemName) return false;
 		let items = await this.getListCurrency();
-		if (items.includes(item)) return false;
-		items.push(item);
+
+		if (items.length > 0 && items.filter(element => element.name === itemName).length === 0) return false;
+		const newItem: ItemCurrency = {
+			name: itemName,
+			notification: {
+				enable: false,
+				minLevel: 0,
+				maxLevel: 0,
+			}
+		}
+
+		items.push(newItem);
 		try {
 			await AsyncStorage.setItem(KeyStorage.listCurrency, JSON.stringify(items));
 		} catch (e) {
@@ -38,15 +56,40 @@ export default class Storage {
 		return true;
 	}
 
-	public static async delItemCurrency(item: string): Promise<boolean> {
-		let items = await this.getListCurrency();
+	public static async updateItemCurrency(item: ItemCurrency): Promise<boolean> {
+		if (!item) return false;
+		let items = await this.getListCurrency()
+		if (items.filter(element => element.name === item.name).length === 0) return false;
 
-		if (items.indexOf(item) !== -1) {
-			items.splice(items.indexOf(item))
-			await AsyncStorage.setItem(KeyStorage.listCurrency, JSON.stringify(items));
-			return true;
+		const newItems = items.filter(element => element.name !== item.name)
+		newItems.push(item)
+		try {
+			await AsyncStorage.setItem(KeyStorage.listCurrency, JSON.stringify(newItems))
+		} catch (e) {
+			throw new Error(e)
 		}
-		return false;
+		return true
+	}
+
+	public static async delItemCurrency(itemName: string): Promise<boolean> {
+		let items = await this.getListCurrency()
+		const newItems = items.filter(element => element.name !== itemName)
+
+		if (items.length > newItems.length) {
+			await AsyncStorage.setItem(KeyStorage.listCurrency, JSON.stringify(newItems))
+			return true
+		}
+		return false
+	}
+
+	public static async removeObjStorage(key: KeyStorage): Promise<boolean> {
+		try {
+			 await AsyncStorage.removeItem(key)
+			 this.listCurrency = []
+			 return true
+		} catch (e) {
+			 return false
+		}
 	}
 
 	public static async saveApiKey(apiKey: string): Promise<boolean> {
