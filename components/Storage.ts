@@ -30,14 +30,25 @@ export default class Storage {
 		const items = await AsyncStorage.getItem(KeyStorage.listCurrency);
 		const resItems = items ? JSON.parse(items) : [];
 		this.listCurrency = resItems;
+		// console.log('Storage:Список выбранных валют:');
+		// console.log(resItems);
 		return resItems;
+	}
+
+	public static async getCurrency(name: string): Promise<ItemCurrency> {
+		const items = await AsyncStorage.getItem(KeyStorage.listCurrency);
+		const resItems = items ? JSON.parse(items) : [];
+		const resArr = resItems.filter((item: ItemCurrency) =>item.name===name);
+		// console.log('Storage:getCurrency:');
+		// console.log(resArr);
+		return resArr && resArr[0] || [];
 	}
 
 	public static async addItemCurrency(itemName: string): Promise<boolean> {
 		if (!itemName) return false;
 		let items = await this.getListCurrency();
+		// if (items.length > 0 && items.filter(element => element.name === itemName).length === 0) return false;
 
-		if (items.length > 0 && items.filter(element => element.name === itemName).length === 0) return false;
 		const newItem: ItemCurrency = {
 			name: itemName,
 			notification: {
@@ -59,10 +70,12 @@ export default class Storage {
 	public static async updateItemCurrency(item: ItemCurrency): Promise<boolean> {
 		if (!item) return false;
 		let items = await this.getListCurrency()
-		if (items.filter(element => element.name === item.name).length === 0) return false;
+		// if (items.filter(element => element.name === item.name).length === 0) return false;
 
-		const newItems = items.filter(element => element.name !== item.name)
+		const newItems = items.filter(element => element.name !== item.name) // список за исключением обновляемого элемента
 		newItems.push(item)
+		// console.log('UpdateItemCurrency:')
+		// console.log(newItems)
 		try {
 			await AsyncStorage.setItem(KeyStorage.listCurrency, JSON.stringify(newItems))
 		} catch (e) {

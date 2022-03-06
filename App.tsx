@@ -54,7 +54,7 @@ interface AppState {
 	fontLoaded: boolean;
 	config: Config;
 	currency: Array<any>;
-	listSelectedCurrency: Array<ItemCurrency>;
+	// listSelectedCurrency: Array<ItemCurrency>;
 	activePage: AppMode;
 	dataUpdate: boolean;
 	expoPushToken: any;
@@ -110,7 +110,7 @@ export default class App extends React.Component<AppProps, AppState> {
 			isLoading: true,
 			fontLoaded: false,
 			currency: [],
-			listSelectedCurrency: [],
+			// listSelectedCurrency: [],
 			config: {
 				apiKey: '',
 			},
@@ -138,7 +138,7 @@ export default class App extends React.Component<AppProps, AppState> {
 	// }
 
 	async componentDidMount() {
-		this.setState({listSelectedCurrency: await Storage.getListCurrency()});
+		// this.setState({listSelectedCurrency: await Storage.getListCurrency()});
 		await ExtService.updateContent(await Storage.getApiKey());
 		// console.log(list);
 		// console.log('App:Component did mount:currency: ');
@@ -151,7 +151,7 @@ export default class App extends React.Component<AppProps, AppState> {
 	}
 
 	async componentDidUpdate() {
-		this.setState({listSelectedCurrency: await Storage.getListCurrency()});
+		// this.setState({listSelectedCurrency: await Storage.getListCurrency()});
 	}
 
 	// Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/dashboard/notifications
@@ -209,10 +209,10 @@ export default class App extends React.Component<AppProps, AppState> {
 
 	render() {
 		const currency = this.state.currency || [];
-		// const listSelectedCurrency = Storage.getListCurrency() || [];
-		const listSelectedCurrency = this.state.listSelectedCurrency || [];
+		// const listSelectedCurrency = this.state.listSelectedCurrency || [];
+		// const listSelectedCurrency = Storage.getListCurrencySync() || [];
+		// console.log('App: listSelectedCurrency');
 		// console.log(listSelectedCurrency);
-		// console.log(currency);
 		const active = this.state.activePage;
 		return (
 			<SafeAreaView style={styles.container}>
@@ -244,7 +244,8 @@ export default class App extends React.Component<AppProps, AppState> {
 					</View>
 				</View>
 
-				{active === AppMode.main && <ListCurrency key={'listCurrency'} items={currency} storageCurrencyList={listSelectedCurrency} />}
+				{/*{active === AppMode.main && <ListCurrency key={'listCurrency'} items={currency} storageCurrencyList={listSelectedCurrency} />}*/}
+				{active === AppMode.main && <ListCurrency key={'listCurrency'} items={currency} />}
 				{active === AppMode.settings &&
 				<AppSettings key={'appSettings'} listCurrencyName={currency.map((item: any) => item.name)}/>}
 				{active === AppMode.about && <AppAbout key={'appAbout'}/>}

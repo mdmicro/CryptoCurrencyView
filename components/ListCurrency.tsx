@@ -6,12 +6,12 @@ import ExtService from "./ExtService";
 
 interface Props {
 	items: Array<any>;
-	/** массив криптовалюты с настройками уведомлений из Storage */
-	storageCurrencyList: Array<ItemCurrency>;
+	// /** массив криптовалюты с настройками уведомлений из Storage */
+	// storageCurrencyList: Array<ItemCurrency>;
 }
 
 interface State {
-	storageCurrencyList: Array<ItemCurrency>;
+	storageCurrencyList: ItemCurrency[];
 	currency: Array<any> | undefined;
 }
 
@@ -28,19 +28,25 @@ export default class ListCurrency extends React.Component<Props, State> {
 
 	async componentDidMount() {
 		this.setState({
-			storageCurrencyList: this.props.storageCurrencyList,
+			// storageCurrencyList: this.props.storageCurrencyList,
+			storageCurrencyList: await Storage.getListCurrency(),
 			currency: this.props.items,
 		})
-		console.log(this.props.storageCurrencyList)
 	}
 
-	render() { // нельзя делать асинхронным !!! будет валить ошибку рендера!!!
+	render() {
 		const extCurrencyData = this.state.currency || [];
-		const currencyList = this.props.storageCurrencyList || [];
+		// const currencyList = this.props.storageCurrencyList || [];
+		// const currencyList = Storage.getListCurrencySync() || [];
+		const currencyList = this.state.storageCurrencyList || [];
+		// console.log('ListCurrency:storageCurrencyList')
+		// console.log(currencyList)
+
 		const listArr = currencyList?.map( item => {
 				const extData = extCurrencyData.filter(extItem => extItem.name === item.name);
 				if (extData.length > 0) {
 					const curData = extData[0]
+
 					return {
 						...item,
 						id: curData.id,
@@ -50,17 +56,22 @@ export default class ListCurrency extends React.Component<Props, State> {
 					}
 				}
 			})
+
+		const buttonCurrencyUpdate = async () => {
+			const apiKey = await Storage.getApiKey();
+			const res = await ExtService.updateContent(apiKey);
+			if (res) {
+				await this.setState({currency: res.data});
+				// console.log('buttonCurrency:res:');
+				// console.log(res);
+				ToastAndroid.show('Обновлено!', ToastAndroid.SHORT);
+			}
+		}
+
 		return (
 			<View>
 				<View style={styles.buttonUpdate}>
-					<Button color={'orange'} title={'Обновить'} onPress={async () => {
-						const res = await ExtService.updateContent(await Storage.getApiKey());
-						if (res) {
-							await this.setState({currency: res.data});
-							// console.log(res);
-							ToastAndroid.show('Обновлено!', ToastAndroid.SHORT);
-						}
-					}}/>
+					<Button color={'orange'} title={'Обновить'} onPress={buttonCurrencyUpdate}/>
 				</View>
 				<ScrollView>
 					{
@@ -72,7 +83,7 @@ export default class ListCurrency extends React.Component<Props, State> {
 													price={item.price}
 													changedHourPrc={item.changedHourPrc}
 													changedDayPrc={item.changedDayPrc}
-													notification={item.notification}
+													// notification={item.notification}
 												 	// enableNotification={item.notification.enable}
 												 	// maxLevelNotification={item.notification.maxLevel}
 													// minLevelNotification={item.notification.minLevel}/>

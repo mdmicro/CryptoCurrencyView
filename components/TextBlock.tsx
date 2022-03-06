@@ -5,6 +5,7 @@ import Storage, {ItemCurrency} from "./Storage";
 
 export interface TextBlockProps extends ItemCurrency {
     id: string;
+    name: string;
     price: number;
     changedHourPrc: number;
     changedDayPrc: number;
@@ -34,6 +35,12 @@ export default class TextBlock extends React.Component<TextBlockProps, TextBlock
     }
 
     async componentDidMount() {
+        const currencySettings = await Storage.getCurrency(this.props.name);
+        currencySettings && this.setState({
+            enableNotification: currencySettings.notification?.enable || false,
+            maxLevel: currencySettings.notification?.maxLevel || 0,
+            minLevel: currencySettings.notification?.minLevel || 0,
+        })
     }
 
     render() {
