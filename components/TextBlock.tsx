@@ -52,10 +52,10 @@ export default class TextBlock extends React.Component<TextBlockProps, TextBlock
                 <View collapsable={true} key={this.props.id} style={styles.block}>
 
                <Text style={styles.textMain}>
-                   {`${this.props.name}(${this.props.name})`}
+                   {`${this.props.name}`}
                </Text>
-               <Text>
-                   {`${this.props.price.toFixed(2)} usd`}
+               <Text  style={{fontSize: 18, fontWeight: 'bold'}}>
+                   {`${this.props.price.toFixed(0)} usd`}
                </Text>
 
                <View style={styles.textRow}>
@@ -74,8 +74,8 @@ export default class TextBlock extends React.Component<TextBlockProps, TextBlock
                 {settingView &&
                 <View style={styles.settingBlock}>
                     <Checkbox value='' isChecked={enableNotification} onChange={(enableNotification: boolean) => this.setState({enableNotification})}>уведомления</Checkbox>
-                    <Input placeholder={'верхний порог, USD'} value={(maxLevel > 0) ? maxLevel.toString() : ''} onChangeText={(text)=>this.setState({maxLevel: parseInt(text) || 0})}/>
-                    <Input placeholder={'нижний порог, USD'} value={(minLevel > 0) ? minLevel.toString() : ''} onChangeText={(text)=>this.setState({minLevel: parseInt(text) || 0})}/>
+                    <Input placeholder={'верхний порог, USD'} value={(maxLevel > 0) ? maxLevel.toString() : ''} onChangeText={(text)=>this.setState({maxLevel: parseInt(text) || 0})} style={{fontSize: 16}} />
+                    <Input placeholder={'нижний порог, USD'} value={(minLevel > 0) ? minLevel.toString() : ''} onChangeText={(text)=>this.setState({minLevel: parseInt(text) || 0})} style={{fontSize: 16}}/>
                     <Button onPress={async () => {
                         const itemCurrency: ItemCurrency = {
                             name: this.props.name,
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(35,31,10,0.35)'
     },
     textMain: {
-        fontSize: 18,
+        fontSize: 22,
         color: '#1063b4',
         fontWeight: 'bold'
     },
